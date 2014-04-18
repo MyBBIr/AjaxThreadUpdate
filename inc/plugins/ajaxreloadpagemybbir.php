@@ -154,12 +154,14 @@ function ajaxreloadpage_showthread()
 				}
 				$ajaxreloadpage['head'] .="	new Ajax.Request('ajax_answers_mybbir.php?tid='+tid".$pagepid.", {
 						method: 'GET', postBody: null, onComplete: function(request) {
-							$('posts').innerHTML=request.responseText;
-							var scripts = request.responseText.extractScripts();
-							scripts.each(function(script)
-							{
-								eval(script);
-							});";
+							if(request.status == 200) {
+								$('posts').innerHTML=request.responseText;
+								var scripts = request.responseText.extractScripts();
+								scripts.each(function(script)
+								{
+									eval(script);
+								});
+							}";
 				if($mybb->settings['ajaxreloadpage_showspinner'] == 1) {
 					$ajaxreloadpage['head'] .="		if(Thread.spinner)
 							{
