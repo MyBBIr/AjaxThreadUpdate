@@ -30,7 +30,7 @@ function ajaxreloadpagemybbir_info()
 		"website"		=> "http://my-bb.ir",
 		"author"		=> "AliReza_Tofighi",
 		"authorsite"	=> "http://my-bb.ir",
-		"version"		=> "1.51",
+		"version"		=> "1.9 آلفا",
 		"guid" 			=> "",
 		"compatibility" => "*"
 	);
