@@ -23,14 +23,15 @@ $plugins->add_hook("showthread_start", "ajaxreloadpage_showthread");
 
 function ajaxreloadpagemybbir_info()
 {
-	global $lang, $plugins_cache;
+	global $lang, $plugins_cache, $PL;
+	$lang->load('ajaxreloadpage');
 	$info = array(
-		"name"			=> "بروزرسانی موضوعات به صورت خودکار و آژاکس",
-		"description"	=> "با استفاده از این پلاگین ارسال ها بدون رفرش صفحه بروزرسانی می شوند!",
+		"name"			=> $lang->ajaxreloadpage,
+		"description"	=> $lang->ajaxreloadpage_desc,
 		"website"		=> "http://my-bb.ir",
 		"author"		=> "AliReza_Tofighi",
 		"authorsite"	=> "http://my-bb.ir",
-		"version"		=> "1.9 آلفا",
+		"version"		=> $lang->ajaxreloadpage_version,
 		"guid" 			=> "",
 		"compatibility" => "*"
 	);
@@ -38,7 +39,7 @@ function ajaxreloadpagemybbir_info()
 	{
 		global $PL;
 		$PL or require_once PLUGINLIBRARY;
-		$info["description"] .= "<br /><a href=\"index.php?module=config/settings&action=change&search=ajaxreloadpage_\">ویرایش تنظیمات</a>.";
+		$info["description"] .= "<br /><a href=\"index.php?module=config/settings&action=change&search=ajaxreloadpage_\">{$lang->ajaxreloadpage_changesettings}</a>.";
 	}
 	return $info;
 }
@@ -46,16 +47,17 @@ function ajaxreloadpagemybbir_info()
 
 function ajaxreloadpagemybbir_activate()
 {
-	global $db, $mybb, $PL;
+	global $db, $mybb, $PL, $lang;
+	$lang->load('ajaxreloadpage');
 	if(!file_exists(PLUGINLIBRARY))
 	{
-		flash_message('برای استفاده از این پلاگین نیاز به پلاگین لایبری است.', "error");
+		flash_message($lang->ajaxreloadpage_misspl, "error");
 		admin_redirect("index.php?module=config-plugins");
 	}
 	$PL or require_once PLUGINLIBRARY;
 	if($PL->version < 12)
 	{
-		flash_message('نسخه‌ی پلاگین لایبری شما قدیمی است.', "error");
+		flash_message($lang->ajaxreloadpage_plistooold, "error");
 		admin_redirect("index.php?module=config-plugins");
 	}
 	include MYBB_ROOT."/inc/adminfunctions_templates.php";
@@ -69,46 +71,45 @@ function ajaxreloadpagemybbir_activate()
 
 	$PL->settings_delete('ajaxreloadpage');
 	$PL->settings("ajaxreloadpage",
-				  'تنظیمات پلاگین بروزرسانی خودکار موضوع',
-				  'نوشته‌ی My-BB.Ir Group',
+				  $lang->ajaxreloadpage,
+				  'By My-BB.Ir Group',
 				  array(
 					"active" => array(
-						'title' => 'فعال باشد؟',
+						'title' => $lang->ajaxreloadpage_active,
 						'description' => '',
 						'value' => 1
 					),
 					"time" => array(
-						'title' => 'زمان بروزرسانی',
-						'description' => 'در صورتی که بر روی صفر قرار دهید بروزرسانی انجام نخواهد شد',
+						'title' => $lang->ajaxreloadpage_time,
+						'description' => $lang->ajaxreloadpage_time_desc,
 						'optionscode' => 'text',
 						'value' => 120
 					),
 					"viewbar" => array(
-						"title" => 'نمایش نوار بروزرسانی',
+						"title" => $lang->ajaxreloadpage_viewbar,
 						'description' => '',
 						'optionscode' => 'select
-0=نمایش داده نشود
-1=در بالا و پائین موضوع نمایش داده شود
-2=تنها در بالای موضوع نمایش داده شود
-3=تنها در پائین موضوع نمایش داده شود',
+0='.$lang->ajaxreloadpage_viewbar_0.'
+1='.$lang->ajaxreloadpage_viewbar_1.'
+2='.$lang->ajaxreloadpage_viewbar_2.'
+3='.$lang->ajaxreloadpage_viewbar_3.'',
 						'value' => '1'
 					),
 					"showspinner" => array(
-						'title' => 'نمایش قسمت درحال بارگذاری',
+						'title' => $lang->ajaxreloadpage_showspinner,
 						'description' => '',
 						'optionscode' => 'onoff',
 						'value' => 1
 					),
 					"message" => array (
-						'title' => 'متن نوار بروزرسانی',
+						'title' => $lang->ajaxreloadpage_message,
 						'description' => '',
 						'optionscode' => 'textarea',
-						'value' => 'بروزرسانی موضوع
-						<sapn style="font-weight:normal">(<timeout->secs> ثانیه یک بار به صورت خودکار بروزرسانی می شود)</span>'
+						'value' => $lang->ajaxreloadpage_message_value
 					),
 					"activeforums" => array (
-						'title' => 'انجمن های فعال',
-						'description' => 'ID انجمن هایی که می خواهید بروزرسانی خودکار برای آنها کارکند را وارد نمائید:<br />با کاما (,) از هم جدا کنید<br />در صورتی که صفر وارد کنید برای همه انجمن ها کار می کند',
+						'title' => $lang->ajaxreloadpage_activeforums,
+						'description' => $lang->ajaxreloadpage_activeforums_desc,
 						'optionscode' => 'textarea',
 						'value' => ''
 					)
@@ -145,7 +146,7 @@ function ajaxreloadpage_showthread()
 	}
 	$seces = $mybb->settings['ajaxreloadpage_time'];
 	if ($mybb->settings['ajaxreloadpage_active'] == 1) {
-		if((in_array($thread['fid'], explode(",", $mybb->settings['ajaxreloadpage_activeforums']))) Or ($mybb->settings['ajaxreloadpage_activeforums'] == 0))
+		if((in_array($thread['fid'], explode(",", $mybb->settings['ajaxreloadpage_activeforums']))) || (!$mybb->settings['ajaxreloadpage_activeforums']))
 		{
 			$ajaxreloadpage['head'] = "<script type=\"text/javascript\">
 				function get_mybbir_ajax_answes(tid, page) {";
