@@ -152,19 +152,36 @@ function ajaxreloadpage_showthread()
 		$pagepid = "";
 		$page = "";
 	}
+	$perpage = $mybb->settings['postsperpage'];
+	$postcount = intval($thread['replies'])+1;
+	$pages = $postcount / $perpage;
+	$pages = ceil($pages);
+	//die($pages);
+	if($page != $pages)
+	{
+		return ;
+	}
 	$seces = $mybb->settings['ajaxreloadpage_time'];
 	if ($mybb->settings['ajaxreloadpage_active'] == 1) {
 		if((in_array($thread['fid'], explode(",", $mybb->settings['ajaxreloadpage_activeforums']))) || (!$mybb->settings['ajaxreloadpage_activeforums']))
 		{
 			$ajaxreloadpage['head'] = "<script type=\"text/javascript\">
-				function get_mybbir_ajax_answes(tid, page) {";
+				function get_mybbir_ajax_answes(tid, page) {
+					var elements = $$('.post_body');
+					var numposts = elements.length;
+					var lastpid = elements[elements.length-1].id;
+					lastpid = lastpid.replace('pid_', '');
+				";
 				if($mybb->settings['ajaxreloadpage_showspinner'] == 1) {
 					$ajaxreloadpage['head'] .= "Thread.spinner = new ActivityIndicator(\"body\", {image: imagepath + \"/spinner_big.gif\"});";
 				}
-				$ajaxreloadpage['head'] .="	new Ajax.Request('ajax_answers_mybbir.php?tid='+tid".$pagepid.", {
+				$ajaxreloadpage['head'] .="	new Ajax.Request('ajax_answers_mybbir.php?pid='+tid+'&lastid='+lastpid+'&numposts='+numposts, {
 						method: 'GET', postBody: null, onComplete: function(request) {
 							if(request.status == 200) {
-								$('posts').innerHTML=request.responseText;
+								$$('.pagination').each(function(element){
+									element.hide();
+								});
+								$('posts').innerHTML+=request.responseText;
 								var scripts = request.responseText.extractScripts();
 								scripts.each(function(script)
 								{
