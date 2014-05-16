@@ -139,27 +139,53 @@ function ajaxreloadpagemybbir_deactivate()
 
 function ajaxreloadpage_showthread()
 {
-	global $db, $mybb, $thread, $templates, $thread_page, $ajaxreloadpage;
-	if (isset($mybb->input['page'])) {
-	$pagepid = "+'&page='+page";
-	$page = $mybb->input['page'];
-	}
-	elseif (isset($mybb->input['pid'])) {
-		$pagepid = "+'&pid='+page";
-		$page = $mybb->input['pid'];
-	}
-	else {
-		$pagepid = "";
-		$page = "";
-	}
+	global $db, $mybb, $thread, $templates, $thread_page, $ajaxreloadpage, $fid, $tid;
 	$perpage = $mybb->settings['postsperpage'];
 	$postcount = intval($thread['replies'])+1;
 	$pages = $postcount / $perpage;
 	$pages = ceil($pages);
-	//die($pages);
+	$page = 1;
+	$perpage = $mybb->settings['postsperpage'];
+	if(isset($mybb->input['page']) && $mybb->input['page'] != "last")
+	{
+		$page = intval($mybb->input['page']);
+	}
+
+	if(!empty($mybb->input['pid']))
+	{
+		
+		if(is_moderator($fid))
+		{
+			$visible = "AND (p.visible='0' OR p.visible='1')";
+		}
+		else
+		{
+			$visible = "AND p.visible='1'";
+		}
+		$post = get_post($mybb->input['pid']);
+		if($post)
+		{
+			$query = $db->query("
+				SELECT COUNT(p.dateline) AS count FROM ".TABLE_PREFIX."posts p
+				WHERE p.tid = '{$tid}'
+				AND p.dateline <= '{$post['dateline']}'
+				{$visible}
+			");
+			$result = $db->fetch_field($query, "count");
+			if(($result % $perpage) == 0)
+			{
+				$page = $result / $perpage;
+			}
+			else
+			{
+				$page = intval($result / $perpage) + 1;
+			}
+		}
+	}
+
 	if($page != $pages)
 	{
-		return ;
+		return;
 	}
 	$seces = $mybb->settings['ajaxreloadpage_time'];
 	if ($mybb->settings['ajaxreloadpage_active'] == 1) {
@@ -172,6 +198,13 @@ function ajaxreloadpage_showthread()
 					var lastpid = elements[elements.length-1].id;
 					lastpid = lastpid.replace('pid_', '');
 				";
+				if($mybb->settings['ajaxreloadpage_showspinner'] == 1) {
+					$ajaxreloadpage['head'] .="		if(Thread.spinner)
+							{
+								Thread.spinner.destroy();
+								Thread.spinner = '';
+							}";
+				}
 				if($mybb->settings['ajaxreloadpage_showspinner'] == 1) {
 					$ajaxreloadpage['head'] .= "Thread.spinner = new ActivityIndicator(\"body\", {image: imagepath + \"/spinner_big.gif\"});";
 				}
