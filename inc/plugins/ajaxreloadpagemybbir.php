@@ -116,6 +116,14 @@ function ajaxreloadpagemybbir_activate()
 				  )
 				);
 	
+	$PL->templates('ajaxreloadpage',
+				   $lang->ajaxreloadpage,
+				   array(
+						'' => '<div style="background:#fcf2b7;font-size:11px;font-weight:bold;text-align:center;border-top:2px solid #f2c71e;border-bottom:2px solid #f2c71e;padding:5px;margin-top:3px;margin-bottom:3px;cursor: pointer;" onclick="{$jsclick}">
+	{$message}
+</div>'
+				   ));
+	
 }
 
 function ajaxreloadpagemybbir_deactivate()
@@ -131,7 +139,7 @@ function ajaxreloadpagemybbir_deactivate()
 
 function ajaxreloadpage_showthread()
 {
-	global $db, $mybb, $thread, $thread_page, $ajaxreloadpage;
+	global $db, $mybb, $thread, $templates, $thread_page, $ajaxreloadpage;
 	if (isset($mybb->input['page'])) {
 	$pagepid = "+'&page='+page";
 	$page = $mybb->input['page'];
@@ -175,15 +183,15 @@ function ajaxreloadpage_showthread()
 					});
 				}
 				";
-				$ajaxreloadpagemessage = str_replace("<timeout->secs>", $seces, $mybb->settings['ajaxreloadpage_message']);
+				$message = str_replace("<timeout->secs>", $seces, $mybb->settings['ajaxreloadpage_message']);
+				$jsclick = "get_mybbir_ajax_answes('{$mybb->input['tid']}','{$page}');";
+
 				if ($mybb->settings['ajaxreloadpage_time'] > 0) {
 					$ajaxreloadpage['head'] .= "setInterval(\"get_mybbir_ajax_answes('{$mybb->input['tid']}','{$page}')\", ".($mybb->settings['ajaxreloadpage_time']*1000).");";
 				}
 				$ajaxreloadpage['head'] .= "\n</script>\n";
 			if($mybb->settings['ajaxreloadpage_viewbar'] >0) {
-				$ajaxreloadpage['message'] = "<div style=\"background:#fcf2b7;font-size:11px;font-weight:bold;text-align:center;border-top:2px solid #f2c71e;border-bottom:2px solid #f2c71e;padding:5px;margin-top:3px;margin-bottom:3px;cursor: pointer;\" onclick=\"get_mybbir_ajax_answes('{$mybb->input['tid']}','{$page}');\">
-						{$ajaxreloadpagemessage}<a href=\"http://my-bb.ir\" title=\"My-BB.Ir\" target=\"_blank\" style=\"color:#fcf2b7;font-size:0px;\">My-BB.Ir</a>
-					</div>";
+				eval("\$ajaxreloadpage['message'] .= \"".$templates->get("ajaxreloadpage")."\";");
 				if($mybb->settings['ajaxreloadpage_viewbar'] != 3) {
 					$ajaxreloadpage['message_top'] = $ajaxreloadpage['message'];
 				}
