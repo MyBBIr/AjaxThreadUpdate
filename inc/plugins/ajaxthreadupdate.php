@@ -146,6 +146,13 @@ function ajaxthreadupdate_deactivate()
 function ajaxthreadupdate()
 {
 	global $db, $mybb, $thread, $templates, $thread_page, $ajaxthreadupdate, $fid, $tid;
+
+	$disablegroups = explode(',', $mybb->settings['ajaxthreadupdate_disablegroups']);
+	if(in_array($mybb->user['usergroup'], $disablegroups))
+	{
+		return;
+	}
+
 	$perpage = $mybb->settings['postsperpage'];
 	$postcount = intval($thread['replies'])+1;
 	$pages = $postcount / $perpage;
@@ -196,6 +203,11 @@ function ajaxthreadupdate()
 	}
 
 	$seces = (int)$mybb->settings['ajaxthreadupdate_time'];
+	if(in_array($mybb->user['usergroup'].'=1', $disablegroups))
+	{
+		$seces = 0;
+	}
+
 	$mybb->settings['ajaxreloadpage_showspinner'] = (bool)$mybb->settings['ajaxreloadpage_showspinner'];
 	$showspinner = 'false';
 	if($mybb->settings['ajaxreloadpage_showspinner'])
