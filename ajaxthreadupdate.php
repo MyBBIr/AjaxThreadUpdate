@@ -11,7 +11,7 @@
 
 define("IN_MYBB", 1);
 define("NO_ONLINE", 1);
-define('THIS_SCRIPT', 'ajax_answers_mybbir.php');
+define('THIS_SCRIPT', 'ajaxthreadupdate.php');
 
 $templatelist = "showthread,postbit,postbit_author_user,postbit_author_guest,showthread_newthread,showthread_newreply,showthread_newreply_closed,postbit_avatar,postbit_find,postbit_pm,postbit_www,postbit_email,postbit_edit,postbit_quote,postbit_report,postbit_signature,postbit_online,postbit_offline,postbit_away,postbit_gotopost,showthread_ratethread,showthread_moderationoptions";
 $templatelist .= ",multipage_prevpage,multipage_nextpage,multipage_page_current,multipage_page,multipage_start,multipage_end,multipage";
