@@ -112,6 +112,12 @@ function ajaxthreadupdate_activate()
 						'description' => $lang->ajaxthreadupdate_activeforums_desc,
 						'optionscode' => 'textarea',
 						'value' => ''
+					),
+					"disablegroups" => array (
+						'title' => $lang->ajaxthreadupdate_disablegroups,
+						'description' => $lang->ajaxthreadupdate_disablegroups_desc,
+						'optionscode' => 'textarea',
+						'value' => ''
 					)
 				  )
 				);
@@ -119,7 +125,7 @@ function ajaxthreadupdate_activate()
 	$PL->templates('ajaxthreadupdate',
 				   $lang->ajaxthreadupdate,
 				   array(
-						'' => '<div style="background:#fcf2b7;font-size:11px;font-weight:bold;text-align:center;border-top:2px solid #f2c71e;border-bottom:2px solid #f2c71e;padding:5px;margin-top:3px;margin-bottom:3px;cursor: pointer;" onclick="{$jsclick}">
+						'' => '<div style="background:#fcf2b7;font-size:11px;font-weight:bold;text-align:center;border-top:2px solid #f2c71e;border-bottom:2px solid #f2c71e;padding:5px;margin-top:3px;margin-bottom:3px;cursor: pointer;" onclick="ATU.update();">
 	{$message}
 </div>'
 				   ));
@@ -162,6 +168,7 @@ function ajaxthreadupdate()
 		{
 			$visible = "AND p.visible='1'";
 		}
+
 		$post = get_post($mybb->input['pid']);
 		if($post)
 		{
@@ -187,69 +194,42 @@ function ajaxthreadupdate()
 	{
 		return;
 	}
-	$seces = $mybb->settings['ajaxthreadupdate_time'];
-	if ($mybb->settings['ajaxthreadupdate_active'] == 1) {
+
+	$seces = (int)$mybb->settings['ajaxthreadupdate_time'];
+	$mybb->settings['ajaxreloadpage_showspinner'] = (bool)$mybb->settings['ajaxreloadpage_showspinner'];
+	$showspinner = 'false';
+	if($mybb->settings['ajaxreloadpage_showspinner'])
+	{
+		$showspinner = 'true';
+	}
+	if($mybb->settings['ajaxthreadupdate_active'] == 1)
+	{
 		if((in_array($thread['fid'], explode(",", $mybb->settings['ajaxthreadupdate_activeforums']))) || (!$mybb->settings['ajaxthreadupdate_activeforums']))
 		{
-			$ajaxthreadupdate['head'] = "<script type=\"text/javascript\">
-				function get_mybbir_ajax_answes(tid, page) {
-					var elements = $$('.post_body');
-					var numposts = elements.length;
-					var lastpid = elements[elements.length-1].id;
-					lastpid = lastpid.replace('pid_', '');
-				";
-				if($mybb->settings['ajaxthreadupdate_showspinner'] == 1) {
-					$ajaxthreadupdate['head'] .="		if(Thread.spinner)
-							{
-								Thread.spinner.destroy();
-								Thread.spinner = '';
-							}";
-				}
-				if($mybb->settings['ajaxthreadupdate_showspinner'] == 1) {
-					$ajaxthreadupdate['head'] .= "Thread.spinner = new ActivityIndicator(\"body\", {image: imagepath + \"/spinner_big.gif\"});";
-				}
-				$ajaxthreadupdate['head'] .="	new Ajax.Request('ajaxthreadupdate.php?pid='+tid+'&lastid='+lastpid+'&numposts='+numposts, {
-						method: 'GET', postBody: null, onComplete: function(request) {
-							if(request.status == 200) {
-								$$('.pagination').each(function(element){
-									element.hide();
-								});
-								$('posts').innerHTML+=request.responseText;
-								var scripts = request.responseText.extractScripts();
-								scripts.each(function(script)
-								{
-									eval(script);
-								});
-							}";
-				if($mybb->settings['ajaxthreadupdate_showspinner'] == 1) {
-					$ajaxthreadupdate['head'] .="		if(Thread.spinner)
-							{
-								Thread.spinner.destroy();
-								Thread.spinner = '';
-							}";
-				}
-				$ajaxthreadupdate['head'] .= "
-						}
-					});
-				}
-				";
-				$message = str_replace("<timeout->secs>", $seces, $mybb->settings['ajaxthreadupdate_message']);
-				$jsclick = "get_mybbir_ajax_answes('{$mybb->input['tid']}','{$page}');";
+			$ajaxthreadupdate['head'] = <<<EOT
+<script type="text/javascript" src="{$mybb->settings['bburl']}/jscripts/ajaxthreadupdate.js?ver=2"></script>
+<script type="text/javascript">
+//<!--
+	ATU.init('{$tid}', '{$seces}', {$showspinner});
+// -->
+</script>
+EOT;
+			$message = str_replace("{time}", $seces, $mybb->settings['ajaxthreadupdate_message']);
 
-				if ($mybb->settings['ajaxthreadupdate_time'] > 0) {
-					$ajaxthreadupdate['head'] .= "setInterval(\"get_mybbir_ajax_answes('{$mybb->input['tid']}','{$page}')\", ".($mybb->settings['ajaxthreadupdate_time']*1000).");";
-				}
-				$ajaxthreadupdate['head'] .= "\n</script>\n";
-			if($mybb->settings['ajaxthreadupdate_viewbar'] >0) {
-				eval("\$ajaxthreadupdate['message'] .= \"".$templates->get("ajaxthreadupdate")."\";");
-				if($mybb->settings['ajaxthreadupdate_viewbar'] != 3) {
+			if($mybb->settings['ajaxthreadupdate_viewbar'] > 0)
+			{
+				eval("\$ajaxthreadupdate['message'] = \"".$templates->get("ajaxthreadupdate")."\";");
+				if($mybb->settings['ajaxthreadupdate_viewbar'] != 3)
+				{
 					$ajaxthreadupdate['message_top'] = $ajaxthreadupdate['message'];
 				}
-				if($mybb->settings['ajaxthreadupdate_viewbar'] != 2) {
+				if($mybb->settings['ajaxthreadupdate_viewbar'] != 2)
+				{
 					$ajaxthreadupdate['message_bottom'] = $ajaxthreadupdate['message'];
 				}
 			}
 		}
 	}
 }
+
 ?>

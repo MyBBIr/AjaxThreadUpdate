@@ -21,8 +21,10 @@ $l['ajaxthreadupdate_viewbar_2'] = 'تنها در بالای موضوع نمای
 $l['ajaxthreadupdate_viewbar_3'] = 'تنها در پائین موضوع نمایش داده شود';
 $l['ajaxthreadupdate_showspinner'] = 'نمایش قسمت درحال بارگذاری';
 $l['ajaxthreadupdate_message'] = 'متن نوار بروزرسانی';
-$l['ajaxthreadupdate_message_value'] = 'بروزرسانی موضوع <sapn style="font-weight:normal">(<timeout->secs> ثانیه یک بار به صورت خودکار بروزرسانی می شود)</span>';
+$l['ajaxthreadupdate_message_value'] = 'بروزرسانی موضوع <sapn style="font-weight:normal">({time} ثانیه یک بار به صورت خودکار بروزرسانی می شود)</span>';
 $l['ajaxthreadupdate_activeforums'] = 'انجمن های فعال';
 $l['ajaxthreadupdate_activeforums_desc'] = 'ID انجمن هایی که می خواهید بروزرسانی خودکار برای آنها کارکند را وارد نمائید:<br />با کاما (,) از هم جدا کنید<br />در صورتی که صفر وارد کنید برای همه انجمن ها کار می کند';
+$l['ajaxthreadupdate_disablegroups'] = 'گروه‌های غیرفعال';
+$l['ajaxthreadupdate_disablegroups_desc'] = 'ID گروه‌هایی که نمی‌خواهید بتوانند از بروزرسانی خودکار موضوع استفاده کنند را وارد کنید. (با , از هم جدا کنید)';
 
 ?>
