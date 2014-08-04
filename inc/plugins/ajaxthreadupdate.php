@@ -4,8 +4,8 @@
  * Copyright 2012 My-BB.Ir Group, All Rights Reserved
  *
  * Website: http://my-bb.ir
+ * By: AliReza_Tofighi
  *
- * $Id: ajaxthreadupdatemybbir.php AliReza_Tofighi $
  */
  
 // Disallow direct access to this file for security reasons
@@ -33,7 +33,7 @@ function ajaxthreadupdate_info()
 		"authorsite"	=> "http://my-bb.ir",
 		"version"		=> "2",
 		"guid" 			=> "",
-		"compatibility" => "*"
+		"compatibility" => "16*"
 	);
 	if($plugins_cache['active']['ajaxthreadupdatemybbir'])
 	{
@@ -243,5 +243,3 @@ EOT;
 		}
 	}
 }
-
-?>

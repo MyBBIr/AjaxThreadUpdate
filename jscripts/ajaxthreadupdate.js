@@ -1,3 +1,11 @@
+/*
+ * Ajax Thread Update javascript library
+ * By: AliReza_Tofighi
+ * For: MyBB 1.6.X
+ * Website: http://my-bb.ir/
+ * GitHub: https://github.com/mybbir/
+ */
+
 var ATU = {
 	tid: 0,
 	time: 0,
